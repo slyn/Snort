@@ -259,11 +259,17 @@ Snort şu üç faklı şekilde çalışması için yapılandırılabilir:
 Kural eylemi kuralın en başında bulunan, belirlenen durumla karşılaşılınca ne yapılacağını belirleyen kısımdır. Snortta bunun için kullanılabilecek başlıca eylemler şunlardır: 
 
 **alert:** belirlenen şekilde alarm üretir ve paketi loglar.
+
 **log:** paketi direk olarak loglar.
+
 **pass:** paketi geçirir paket için herhangi bir alarm ya da loglama işlemin de bulunmaz.  
+
 **drop:** paketi engeller ve kaydeder.
+
 **reject:** paketi engeller, kaydeder ve protokole göre hata mesajı üretir. Örneğin, UDP protokolü kullanılıyor ise ICMP porta ulaşılamadı hata mesajı gönderir.
+
 **sdrop:** paketi engeller ve kaydetmez.
+
 Ayrıca, Snort’un output modülünde de anlatılmış olan ruletype ile kendimize göre kural eylemleri üretebiliriz.
 
 * **Protokoller**
@@ -319,11 +325,11 @@ Ayrıca, Snort’un output modülünde de anlatılmış olan ruletype ile kendim
 ## C. Aktif & Dinamik Kurallar
 
 <p>Aktif ve Dinamik kurallar snortun güçlü yönlerinden birisidir. Bu anahtar kelimeler sayesinde çalışan herhangi bir kural başka bir kuralı aktifleştirebilir. 'activate' eylem başlığı kullanan bir aktif kural aynı alarm kuralı gibi davranır, sadece tanımlanırken ek olarak kural seçeneği kısmında 'activates' parametresi  bulunmak zorundadır. Dinamik kural ise 'dynamic' eylem başlığını kullanır ve aynı loglama yapan kurallar gibi davranır. Tanımlanırken kural seçeneği kısmında 'activated_by' parametresi kullanılmak zorundadır.</p>
-> activate tcp !$HOME_NET any -> $HOME_NET 143 (flags: PA; content: “|E8C0FFFFFF|/bin”; activates:1; msg: “IMAP buffer overflow!”;)
+```activate tcp !$HOME_NET any -> $HOME_NET 143 (flags: PA; content: “|E8C0FFFFFF|/bin”; activates:1; msg: “IMAP buffer overflow!”;)```
 
-> dynamic tcp !$HOME_NET any -> $HOME_NET 143 (activated_by:1; count:50;)
+``` dynamic tcp !$HOME_NET any -> $HOME_NET 143 (activated_by:1; count:50;)```
 
-Bu örnekte Snort’a ‘eğer ev ağı dışından bir IP’den 143 numaralı porta paket gelirse ve IMAP taşması olursa sonraki 50 paketi al ve daha sonra analiz etmek için sakla’ komutunu veriyor.
+> Bu örnekte Snort’a ‘eğer ev ağı dışından bir IP’den 143 numaralı porta paket gelirse ve IMAP taşması olursa sonraki 50 paketi al ve daha sonra analiz etmek için sakla’ komutunu veriyor.
 **(Snort Rules - Activate/Dynamic Rules, n.d.)**
 
 ## D. Kendi Kurallarımızı Oluşturmak
