@@ -175,10 +175,11 @@ Detection engine bileşeninin çıktılarını yönlendirmemizi veya başka şek
 
 <p>Snort loglarını veri tabanda sistematik bir şekilde tutabiliriz. Örneğin snort çıktılarını bir MySQL veri tabanında tutacağız. Veri tabanın ismi snort olsun kullanıcı adı ‘snort’, şifresi de ‘test’ olsun ve veri tabanı yerel makinada bulunsun. Bu durumda snort.conf dosyasında aşağıdaki gibi bir bildirim bulunmalıdır.</p>
 
-> output database: log, mysql, user=snort password=test dbname=snort host=localhost
+```output database: log, mysql, user=snort password=test dbname=snort host=localhost```
 
 •	SMB pop-up olarak Windows' a göndermek:
-> output alert_smb: workstation.list
+
+```output alert_smb: workstation.list```
 
 •	Hem SMB Windows’ a göndermek hem de veri tabanına kayıt etmek:
 <p>
@@ -194,7 +195,8 @@ Bazen çıktıların birden fazla yere bildirilmesi gerekebilir. Böyle bir duru
 ```
 
 Bu belirlenen aksiyon tipini snort kurallarında kullanırken de aşağıdaki şekilde kullanılır.
-> smb_ddb_alert icmp any any -> 192.168.1.0/24 any (fragbits: D; msg: "Dont Fragment bit set";)
+
+```smb_ddb_alert icmp any any -> 192.168.1.0/24 any (fragbits: D; msg: "Dont Fragment bit set";)```
 
 ## F. Snort Platformları
 
@@ -278,7 +280,7 @@ Ayrıca, Snort’un output modülünde de anlatılmış olan ruletype ile kendim
 * **IP Adresleri**
 <p>Örnek kuralda *$EXTERNAL_NET* ve *$HOME_NET* yazan kısımlardır ve bu kısımlar aşağıdaki gibi olabilir hatta buralara 192.168.1.5 veya 192.1.0/24 gibi IP adresi ve CIDR blok da yazılabilir. Ayrıca, hariç tutmak için kullanılan ‘!’ operatörü de bu kısımlarda kullanılabilir.</p>
 
-> alert tcp !192.168.1.0/24 any -> 192.168.1.0/24 any (content: “ICERIK”; msg: “DIŞ AĞDAN”;)
+```alert tcp !192.168.1.0/24 any -> 192.168.1.0/24 any (content: “ICERIK”; msg: “DIŞ AĞDAN”;)```
 
 * **Port Adresleri**
 <p>Port adreslerini, özel olarak belli bir yolu dinlemek için kullanırız. Port numaraları için ayrılmış olan kısımlar daha önceden yazmış olduğumuz kural örneklerinde “any” olarak yazdığımız bölümlerdir. Bu kısımlara 80, 21, 22 gibi port numaraları girerek daha spesifik kurallar da oluşturabiliriz. Çeşitli şekillerdeki kullanımlarını görmek için aşağıdaki kural örneklerini inceleyebiliriz.</p>
@@ -325,6 +327,7 @@ Ayrıca, Snort’un output modülünde de anlatılmış olan ruletype ile kendim
 ## C. Aktif & Dinamik Kurallar
 
 <p>Aktif ve Dinamik kurallar snortun güçlü yönlerinden birisidir. Bu anahtar kelimeler sayesinde çalışan herhangi bir kural başka bir kuralı aktifleştirebilir. 'activate' eylem başlığı kullanan bir aktif kural aynı alarm kuralı gibi davranır, sadece tanımlanırken ek olarak kural seçeneği kısmında 'activates' parametresi  bulunmak zorundadır. Dinamik kural ise 'dynamic' eylem başlığını kullanır ve aynı loglama yapan kurallar gibi davranır. Tanımlanırken kural seçeneği kısmında 'activated_by' parametresi kullanılmak zorundadır.</p>
+
 ```activate tcp !$HOME_NET any -> $HOME_NET 143 (flags: PA; content: “|E8C0FFFFFF|/bin”; activates:1; msg: “IMAP buffer overflow!”;)```
 
 ``` dynamic tcp !$HOME_NET any -> $HOME_NET 143 (activated_by:1; count:50;)```
@@ -338,7 +341,7 @@ Ayrıca, Snort’un output modülünde de anlatılmış olan ruletype ile kendim
 
 <p>Basit seviyede snort kuralları yazalım ve bu kuralı sisteme tanıtıp sistemin kuralımıza nasıl cevap verdiğini görelim. Öncelikle kuralımızı yazacağımız kural dosyasını diğer kural dosyalarının olduğu dizine oluşturalım ardından kural başlığı kısmı ile devam edebiliriz.</p>
 
-> nano /etc/snort/rules/zzz.rules
+```# nano /etc/snort/rules/zzz.rules```
 
 1. Kural Başlığı 
       1.  Eylem -> log
@@ -351,11 +354,11 @@ Ayrıca, Snort’un output modülünde de anlatılmış olan ruletype ile kendim
 
 2.  Kural Seçeneği için herhangi bir parametre girmemize bu kural için gerek yok. Aşağıdaki kuralı dosyaya yazdıktan sonra kaydedip çıkabiliriz.
 
-> log TCP !192.168.2.182 any -> 192.168.2.182 any
+```log TCP !192.168.2.182 any -> 192.168.2.182 any```
 
 <p>Şimdi de kural dosyamızı snort.conf dosyasında yer alan diğer kural dosyalarının arasına ekliyoruz.</p>
 
-> nano /etc/snort/snort.conf
+```# nano /etc/snort/snort.conf```
 
  **'include $RULE_PATH/zzz.rules'** satırını ekleyip snort.conf dosyasından çıkıyoruz. Snort’u başlattığımızda 192.168.2.182 adresine, 192.168.2.182 dışındaki tüm IP adreslerinden gelen TCP paketleri kaydeder.
 	
