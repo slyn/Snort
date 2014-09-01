@@ -256,3 +256,103 @@ Snort şu üç faklı şekilde çalışması için yapılandırılabilir:
 ![KURAL](Kuralgrafigi)
 
 <p>Snort kuralları kural başlığı ve kural seçeneği olmak üzere iki kısımdan oluşur. Kural başlığı kural eylemi, kural protokolü, hedef ve kaynak ip adresleri ile hedef ve kaynak port bilgilerini bulundurur. Diğer kısım ise hangi durumda belirlenen eylemin gerçekleşeceğini ve alarm mesajı ile ilgili özelliklerin tanımlandığı alanları içerir. Parantez işaretine kadar olan kısım kural başlığını (rule header) oluşturur ve her kuralda bulunması gereken kısımdır. Parantez içerisindeki kısım ise kural seçeneğini (rule options) oluşturur.</p>
+
+## A. Kural Başlığı
+* **Kural Eylemi**
+Kural eylemi kuralın en başında bulunan, belirlenen durumla karşılaşılınca ne yapılacağını belirleyen kısımdır. Snortta bunun için kullanılabilecek başlıca eylemler şunlardır: 
+
+**alert:** belirlenen şekilde alarm üretir ve paketi loglar.
+**log:** paketi direk olarak loglar.
+**pass:** paketi geçirir paket için herhangi bir alarm ya da loglama işlemin de bulunmaz.  
+**drop:** paketi engeller ve kaydeder.
+**reject:** paketi engeller, kaydeder ve protokole göre hata mesajı üretir. Örneğin, UDP protokolü kullanılıyor ise ICMP porta ulaşılamadı hata mesajı gönderir.
+**sdrop:** paketi engeller ve kaydetmez.
+Ayrıca, Snort’un output modülünde de anlatılmış olan ruletype ile kendimize göre kural eylemleri üretebiliriz.
+
+* **Protokoller**
+<p>Hangi protokole sahip paketlerin incelemeye alınacağını belirlemek için kullanılır, kural başlığında ikinci sırada bulunur. Snort’ un şu anda güncel olarak saldırı belirlemesi yapabildiği dört protokol vardır. Bunlar TCP, UDP, ICMP ve IP protokolleridir. İlerleyen zamanlarda belki de ARP, IGRP, GRE, OSPF, RIP, IPX gibi protokolleri de kullanabiliyor olacağız.</p>
+
+* **IP Adresleri**
+<p>Örnek kuralda *$EXTERNAL_NET* ve *$HOME_NET* yazan kısımlardır ve bu kısımlar aşağıdaki gibi olabilir hatta buralara 192.168.1.5 veya 192.1.0/24 gibi IP adresi ve CIDR blok da yazılabilir. Ayrıca, hariç tutmak için kullanılan ‘!’ operatörü de bu kısımlarda kullanılabilir.</p>
+
+> alert tcp !192.168.1.0/24 any -> 192.168.1.0/24 any (content: “ICERIK”; msg: “DIŞ AĞDAN”;)
+
+* **Port Adresleri**
+<p>Port adreslerini, özel olarak belli bir yolu dinlemek için kullanırız. Port numaraları için ayrılmış olan kısımlar daha önceden yazmış olduğumuz kural örneklerinde “any” olarak yazdığımız bölümlerdir. Bu kısımlara 80, 21, 22 gibi port numaraları girerek daha spesifik kurallar da oluşturabiliriz. Çeşitli şekillerdeki kullanımlarını görmek için aşağıdaki kural örneklerini inceleyebiliriz.</p>
+
+|KURAL|FONKSIYONU|
+|:---:|:--------:|
+|log udp any any -> 192.168.1.0/24 1:1024|Belirlenen IP aralığındaki herhangi bir makinenin 1 ile 1024 arasında değişen numaralı portlarına gönderilmiş udp protokolünü kullanan herhangi bir IP adresi ve portundan gelen bütün paketleri loglar|
+|log tcp any any -> 192.168.1.0/24 :6000|TCP protokolünü kullanan ve belirlenen IP aralığında 6000 ve daha düşük numaraya sahip portları hedef alan herhangi bir IP ve porttan gönderilmiş bütün paketleri loglar|
+|log tcp any :1024 -> 192.168.1.0/24 500:|Herhangi bir IP den belirlenen IP aralığına giden, TCP protokolünü kullanan ve 1024 numaralı porta kadar olan herhangi bir porttan 500 numaralı ve üzerindeki portları hedef alan paketleri loglar|
+|log tcp any any -> 192.168.1.0/24 !6000:6010|TCP protokolünü kullanan herhangi bir porttan ve herhangi bir IP’ den belirlenen IP aralığına ve 6000 hariç 6010 numaralı porta kadar olan portları hedef alan paketleri loglar|
+**(Writing Snort Rules , -)**
+
+* **Yön Operatörü**
+<p>İncelenecek olan paketlerin iletim yönünü belirlemek için kullanılır. Bizim sistemimizden çıkan paketleri mi yoksa bizim sistemimize gönderilen paketlerimi inceleceğimizi belirleyebilmek için kullanırız. Üç faklı yön belirleme yöntemi bulunur. Bunlar ‘->’, ‘<-‘, ‘<>’ şeklindedir.</p>
+
+## B. Kural Seçenekleri
+<p>Kural seçenekleri, Snort kurallarına esneklik ve güç kazandırır aynı zamanda bu kuralların en önemli parçasıdır. Kural seçenekleri kısmı oluşturulurken her yazılmış parametreden sonra ‘;’ karakteri konulur. Genellikle snort kurallarında kullanılan başlıca kural seçenekleri aşağıdakilerden oluşmaktadır:</p>
+
+* msg: alarma ve kaydedilen paket için mesaj yazar.
+* logto: standart log tutulan dosya yerine özel belirlenmiş dosyaya paketi kaydetmek için kullanılır.
+* ttl: IP başlığındaki TTL değerini test etmek için kullanılır.
+* id: IP başlığındaki ID değerini test etmek için kullanılır.
+* content: paket içeriğindeki değeri incelemek için kullanılır.
+* offset: content parametresinin neresinden incelenmeye başlayacağını söylemek için kullanılır.
+* depth: içeriğin ne kadar derinlemesine inceleneceğini düzenlemek için kullanılır.
+* within: ilk content parametresinden sonra ne kadar byte içerisinde diğer content parametresi aranacağını söylemek için kullanılır.
+* flags: TCP bayraklarını kesin değer için test eder.
+* seq: TCP sequence number kısmını test etmek için kullanılır.
+* ack: TCP acknoledgement alanını test etmek için kullanılır.
+* itype: ICMP type alanı için karşıt bir değer belirlemekte kullanılır.
+* icode: ICMP code alanı için karşıt bir değer belirlemekte kullanılır.
+* session: uygulama katmanı için kullanılır.
+* sid: eşsiz, tek snort kuralı tanımlaması yapabilmek için kullanılır. Genellikle ‘rev’ ile kullanılır. 
+      * 100’den küçük sayılar gelecekte kullanılmak için ayrılmıştır.
+      * 100-999,999 Aralığını snort dağıtımı ile beraber gelen kurallar kullanır.
+      * 1,000,000 ve yukarısı yerel kurallar için kullanılır.
+* rev: snort kuralı revizyonlarının sayısıdır. Sid ile beraber kullanılır. 
+* classification: kuralı snıflandırmak için kullanılır.
+* priority: kurala önem derecesi tanımlamak için kullanılır.
+* resp: udp ve tcp bağlantısı sonlandırmak amaçlı kullanılır.
+
+<p>Yukarıda verilmiş olan kural seçenekleri, sıklıkla kullanılan kural seçeneklerinin bir kısmıdır. Snort kuralları oluşturulurken yazılmak istenen kurala göre kural seçenekleri değişiklik gösterir bu yüzden faklı seçeneklere ihtiyaç duyabilirsiniz. Bu seçeneklerin daha fazlasına erişmek ve örnek kullanımlarını görmek için. http://manual.snort.org/node27.html bağlantısını kullanabilirsiniz.</p>
+
+## C. Aktif & Dinamik Kurallar
+
+<p>Aktif ve Dinamik kurallar snortun güçlü yönlerinden birisidir. Bu anahtar kelimeler sayesinde çalışan herhangi bir kural başka bir kuralı aktifleştirebilir. 'activate' eylem başlığı kullanan bir aktif kural aynı alarm kuralı gibi davranır, sadece tanımlanırken ek olarak kural seçeneği kısmında 'activates' parametresi  bulunmak zorundadır. Dinamik kural ise 'dynamic' eylem başlığını kullanır ve aynı loglama yapan kurallar gibi davranır. Tanımlanırken kural seçeneği kısmında 'activated_by' parametresi kullanılmak zorundadır.</p>
+> activate tcp !$HOME_NET any -> $HOME_NET 143 (flags: PA; content: “|E8C0FFFFFF|/bin”; activates:1; msg: “IMAP buffer overflow!”;)
+
+> dynamic tcp !$HOME_NET any -> $HOME_NET 143 (activated_by:1; count:50;)
+
+Bu örnekte Snort’a ‘eğer ev ağı dışından bir IP’den 143 numaralı porta paket gelirse ve IMAP taşması olursa sonraki 50 paketi al ve daha sonra analiz etmek için sakla’ komutunu veriyor.
+**(Snort Rules - Activate/Dynamic Rules, n.d.)**
+
+## D. Kendi Kurallarımızı Oluşturmak
+
+<p>Snort kuralları oluşturup bu kurallar ile sistemi korumak oldukça kolaydır. Fakat profesyonel seviyede snort kuralları oluşturup saldırı tespit sisteminizi yönetmek için aynı zamanda da TCP/IP, OSI modeli gibi ağ iletişimi, mimarisi ve protokollerini de ileri düzeyde kavramış olmak gerekmektedir.</p>
+
+<p>Basit seviyede snort kuralları yazalım ve bu kuralı sisteme tanıtıp sistemin kuralımıza nasıl cevap verdiğini görelim. Öncelikle kuralımızı yazacağımız kural dosyasını diğer kural dosyalarının olduğu dizine oluşturalım ardından kural başlığı kısmı ile devam edebiliriz.<p>
+
+> nano /etc/snort/rules/zzz.rules
+
+* Kural Başlığı 
+      * Eylem -> log
+      * Protokol -> TCP
+      * Dış ağ -> !IP -> !192.168.2.182
+      * Kaynak port -> any
+      * Yön -> '->'
+      * İç Ağ -> 192.168.2.182
+      * Hedef port -> any
+* Kural Seçeneği için herhangi bir parametre girmemize bu kural için gerek yok. Aşağıdaki kuralı dosyaya yazdıktan sonra kaydedip çıkabiliriz.
+
+> log TCP !192.168.2.182 any -> 192.168.2.182 any
+
+Şimdi de kural dosyamızı snort.conf dosyasında yer alan diğer kural dosyalarının arasına ekliyoruz. 
+
+> nano /etc/snort/snort.conf
+
+	<p>'include $RULE_PATH/zzz.rules' satırını ekleyip snort.conf dosyasından çıkıyoruz. Snort’u başlattığımızda 192.168.2.182 adresine, 192.168.2.182 dışındaki tüm IP adreslerinden gelen TCP paketleri kaydeder.</p>
+	
+	
