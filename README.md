@@ -184,17 +184,14 @@ Detection engine bileşeninin çıktılarını yönlendirmemizi veya başka şek
 <p>
 Bazen çıktıların birden fazla yere bildirilmesi gerekebilir. Böyle bir durumda ruletype anahtar kelimesiyle eylemimizi belirleyebiliriz. Örneğin snort.conf dosyasında *'smb_db_alert'* olarak belirlediğimiz bir eylem tipi hem veri tabanına kayıt yapıp hem de SMB pop-up uyarısı verecektir. Bunun için aşağıdaki gibi bir bildirim yapılmalıdır.</p>
 
-> ruletype smb_db_alert
-
->   {
-
->  	  type alert
-
->  	  output alert_smb: workstation.list
-
->  	  output database: log, mysql, user=snort password=test dbname=snort host=localhost
-
->   }
+```
+ ruletype smb_db_alert
+   {
+  	  type alert
+  	  output alert_smb: workstation.list
+  	  output database: log, mysql, user=snort password=test dbname=snort host=localhost
+   }
+```
 
 Bu belirlenen aksiyon tipini snort kurallarında kullanırken de aşağıdaki şekilde kullanılır.
 > smb_ddb_alert icmp any any -> 192.168.1.0/24 any (fragbits: D; msg: "Dont Fragment bit set";)
