@@ -333,26 +333,27 @@ Bu örnekte Snort’a ‘eğer ev ağı dışından bir IP’den 143 numaralı p
 
 <p>Snort kuralları oluşturup bu kurallar ile sistemi korumak oldukça kolaydır. Fakat profesyonel seviyede snort kuralları oluşturup saldırı tespit sisteminizi yönetmek için aynı zamanda da TCP/IP, OSI modeli gibi ağ iletişimi, mimarisi ve protokollerini de ileri düzeyde kavramış olmak gerekmektedir.</p>
 
-<p>Basit seviyede snort kuralları yazalım ve bu kuralı sisteme tanıtıp sistemin kuralımıza nasıl cevap verdiğini görelim. Öncelikle kuralımızı yazacağımız kural dosyasını diğer kural dosyalarının olduğu dizine oluşturalım ardından kural başlığı kısmı ile devam edebiliriz.<p>
+<p>Basit seviyede snort kuralları yazalım ve bu kuralı sisteme tanıtıp sistemin kuralımıza nasıl cevap verdiğini görelim. Öncelikle kuralımızı yazacağımız kural dosyasını diğer kural dosyalarının olduğu dizine oluşturalım ardından kural başlığı kısmı ile devam edebiliriz.</p>
 
 > nano /etc/snort/rules/zzz.rules
 
-* Kural Başlığı 
-      * Eylem -> log
-      * Protokol -> TCP
-      * Dış ağ -> !IP -> !192.168.2.182
-      * Kaynak port -> any
-      * Yön -> '->'
-      * İç Ağ -> 192.168.2.182
-      * Hedef port -> any
-* Kural Seçeneği için herhangi bir parametre girmemize bu kural için gerek yok. Aşağıdaki kuralı dosyaya yazdıktan sonra kaydedip çıkabiliriz.
+1. Kural Başlığı 
+      1.  Eylem -> log
+      2.  Protokol -> TCP
+      3.  Dış ağ -> !IP -> !192.168.2.182
+      4.  Kaynak port -> any
+      5.  Yön -> '->'
+      6.  İç Ağ -> 192.168.2.182
+      7. Hedef port -> any
+
+2.  Kural Seçeneği için herhangi bir parametre girmemize bu kural için gerek yok. Aşağıdaki kuralı dosyaya yazdıktan sonra kaydedip çıkabiliriz.
 
 > log TCP !192.168.2.182 any -> 192.168.2.182 any
 
-Şimdi de kural dosyamızı snort.conf dosyasında yer alan diğer kural dosyalarının arasına ekliyoruz. 
+<p>Şimdi de kural dosyamızı snort.conf dosyasında yer alan diğer kural dosyalarının arasına ekliyoruz.</p>
 
 > nano /etc/snort/snort.conf
 
-	<p>'include $RULE_PATH/zzz.rules' satırını ekleyip snort.conf dosyasından çıkıyoruz. Snort’u başlattığımızda 192.168.2.182 adresine, 192.168.2.182 dışındaki tüm IP adreslerinden gelen TCP paketleri kaydeder.</p>
+ **'include $RULE_PATH/zzz.rules'** satırını ekleyip snort.conf dosyasından çıkıyoruz. Snort’u başlattığımızda 192.168.2.182 adresine, 192.168.2.182 dışındaki tüm IP adreslerinden gelen TCP paketleri kaydeder.
 	
 	
