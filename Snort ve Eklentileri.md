@@ -711,11 +711,86 @@ Barnyard’in, sysconfig dizinindeki dosyası içinde bulunan LOG_FILE değişke
 
 > ...
 
+```
+# service snortd start
+# service barnyard2 start
+```
+__SERVISLER CALISIYOR RESMI__()
 
+### 1. MySQL veri tabanı oluşturmak gerekli izinleri sağlamak
+```
+# chkconfig --levels 235 mysqld on
+# service mysqld start
+# mysql_secure_installation
+```
 
+Yukarıdaki komuttan sonra karşımıza gelen ekranda bizden root parolası isteyecektir buraya herhangi bir değer girmeden **“\<enter>”** deyip geçiyoruz bizden mysql için yeni root parolası isteyecektir. Buraya _“parola”_ giriyoruz. Diğer seçenekler için **‘y’** diyerek geçebiliriz.
 
+Simdi de snort veri tabanını oluşturalım.
+```
+# mysql –u root –p
+```
+> create database snort;
 
+> grant all on snort.* to snort@localhost;
 
+> set password for snort@localhost=password(‘test’);
+
+> use snort;
+
+> show tables;
+
+*** RESIM SEKIL 6 ***
+
+> source /usr/local/src/snort/barnyard2/schemas/create_mysql
+
+> show tables;
+
+Artık veri tabanımızda tablolarımız var.
+
+> flush privileges;
+
+> \q
+
+Barnyard config dosyasında yapılması gereken düzenlemeler yapılır.
+```
+# nano /usr/local/etc/barnyard2.conf
+```
+> ...
+
+> config hostname: localhost
+
+> config interface: eth0
+
+> ...
+
+> output database: log, mysql, user=snort password=parola dbname=snort host=localhost
+
+> ...
+
+__SEKIL 7__
+
+__SEKIL 8__
+
+Barnyardı yeniden başlatmalıyız.
+```
+# service barnyard2 restart
+```
+## B. BASE Kurulumu
+
+BASE veri tabanına kaydedilmiş olan snort loglarını bir web sayfası üzerinden yayınlamaya yarar, bunun için web sunucusu olarak apache kullanacağız. Veri tabanı ile ilişkisini de adodb ile sağlayacağız. BASE için gerekli olan ve paket depomuzda da bulunan programları indiriyoruz.
+```
+# yum install httpd php php-common php-gd php-cli php-mysql php-pear php-gd unzip -y
+```
+Web ara yüzünde bulunacak görsel şablonlar ve tablolar için:
+```
+# pear install --force Image_Color-1.0.4
+# pear install --force Image_Canvas-0.3.5
+# pear install --force Image_Graph -0.8.0
+
+# chkconfig mysqld on
+# service mysqld start
+```
 
 
 
