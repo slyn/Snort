@@ -43,13 +43,7 @@ ve SES araçlar geliştirildi. Bu araçları doğru şekilde yapılandırarak a�
 ölçüde sağlayabiliriz.</p>
 
 
-<p>Peki, büyüyen siber dünya ile beraber gelen bu STS nedir? STS yani saldırı tespit sistemleri, 
-bilginin elektronik ortamlarda taşınırken, işlenirken veya depolanırken başına gelebilecek tehlike ve 
-tehditlerin ortadan kaldırılması veya bunlara karşı tedbir alınması amacıyla, bilgiye yetkisiz erişim ve 
-bilginin kötüye kullanılması gibi internet veya yerel ağdan gelebilecek çeşitli paket ve verilerden oluşan 
-girişimleri tespit edebilme, bu tespitleri sms, e-posta veya SNMP mesajları ile sistem güvenliğinden 
-sorumlu kişilere iletebilme ve gerektiğinde paketi/erişimi düşürebilme özelliğine sahip yazılımsal 
-ve/veya donanımsal güvenlik araçları olarak tanımlanabilir. (KAYA & ERDEM, 2014)</p>
+Peki, büyüyen siber dünya ile beraber gelen bu STS nedir? STS yani saldırı tespit sistemleri, bilginin elektronik ortamlarda taşınırken, işlenirken veya depolanırken başına gelebilecek tehlike ve tehditlerin ortadan kaldırılması veya bunlara karşı tedbir alınması amacıyla, bilgiye yetkisiz erişim ve bilginin kötüye kullanılması gibi internet veya yerel ağdan gelebilecek çeşitli paket ve verilerden oluşan girişimleri tespit edebilme, bu tespitleri sms, e-posta veya SNMP mesajları ile sistem güvenliğinden sorumlu kişilere iletebilme ve gerektiğinde paketi/erişimi düşürebilme özelliğine sahip yazılımsal ve/veya donanımsal güvenlik araçları olarak tanımlanabilir. __(KAYA & ERDEM, 2014)__
 
 STS’ler aşağıdaki kriterler başta olmak üzere değişik ölçütlere göre sınıflandırılabilir:
 
@@ -82,11 +76,7 @@ geliştirilmiş bir saldırı tekniği ise sistem bunu tehdit unsuru olarak alg�
 
 ## C. Saldırı Tespit Sistemlerinde Kullanılan Yöntemler
 
-<p>STS’lerin geliştirilmesinde günümüze kadar istatistiksel yöntemlerin dışında, kural tabanlı 
-(rule based), eşik değeri belirleme (threshold value), durum geçiş diyagramları (state transition 
-diagrams), yapay sinir ağları (artificial neural networks), veri madenciliği (data mining), yapay 
-bağışıklık sistemi (artificial immune system), bulanık mantık (fuzzy logic) gibi farklı birçok 
-yaklaşım uygulanmıştır**(GÜVEN & SAĞIROĞLU, 2008)**.</p>
+STS’lerin geliştirilmesinde günümüze kadar istatistiksel yöntemlerin dışında, kural tabanlı (rule based), eşik değeri belirleme (threshold value), durum geçiş diyagramları (state transition diagrams), yapay sinir ağları (artificial neural networks), veri madenciliği (data mining), yapay bağışıklık sistemi (artificial immune system), bulanık mantık (fuzzy logic) gibi farklı birçok yaklaşım uygulanmıştır. __(GÜVEN & SAĞIROĞLU, 2008)__
 
 ## D. Kaçak Giriş Tespit ve Engelleme Sistemleri (IDS/IPS)
 
@@ -791,19 +781,234 @@ Web ara yüzünde bulunacak görsel şablonlar ve tablolar için:
 # chkconfig mysqld on
 # service mysqld start
 ```
+### 1. Apache Server Kurulumu
+
+Apache server kurulumu yapmak, BASE eklentisi için ilk ve en önemli adımlardan biridir. Tutulan saldırı kayıtlarını bir web sayfasında göstermek için önce bu web sayfasını yayınlayacak olan web sunucusu kurulumu yapıp bunu da istediğimiz gibi yapılandırabiliriz.
+
+Aşağıdaki komut ile zaten daha önceden bu yazılımı indirmiştik.
+```
+# yum install httpd
+```
+Paket deposu yardımı ile kurmuş olduğumuz bu programı sistemimize uygun şekilde yapılandırmak istersek bunun için şu komutları kullanabiliriz. Bu komut bizi apache server’ın yapılandırma dosyasına götürür: 
+```
+# nano /etc/httpd/conf/httpd.conf
+```
+Ayrıca bu dosya sayesinde dizinlere erişimi kısıtlayabiliriz bunun için dosyaya şu satırları ekleyelim:
+
+>      \<directory "/var/www/html/base">
+
+>       	Options FollowSymLinks
+
+>       	AllowOverride None
+
+>       	AuthType Basic
+
+>       	AuthName “SnortIDS”
+
+>       	AuthUserFile /var/www/passwords/passwords
+
+>       	Require user base
+
+>      \</directory>
+
+Burada apache server’ın kullanmasını istediğimiz veya istemediğimiz modüllerini httpd.conf dosyasından kullanıma açabilir veya kapatabiliriz.
+
+__SEKIL 9__
+
+Iptables servisinde gerekli değişiklikler yapılmalıdır:
+
+* IPv4 için:
+
+```
+     #nano /etc/sysconfig/iptables
+```
+     
+Açılan dosyaya aşağıdaki satırları ekleyip kaydediyoruz.
+
+>      -A INPUT –m state --state NEW –p tcp --dport 80 –j ACCEPT
+
+>      -A INPUT –m state --state NEW –p tcp --dport 443 –j ACCEPT
+
+Kayıt işleminden sonra servisi yeniden başlatıyoruz.
+```
+     # service iptables start
+```
+
+* IPv6 için:
+
+```
+     #nano /etc/sysconfig/ip6tables
+```
+Açılan dosyaya aşağıdaki satırları ekleyip kaydediyoruz.
+
+>      -A INPUT –m state --state NEW –m tcp –p tcp --dport 80 –j ACCEPT
+
+>      -A INPUT –m state --state NEW –m tcp –p tcp --dport 443 –j ACCEPT
+
+Kayıt işleminden sonra servisi yeniden başlatıyoruz.
+```
+     # service ip6tables start
+```
+### 2. ADODB kurulumu
+
+Veri tabanı bağlantısı kurmak için kullanılır.
+```
+# cd /usr/local/src/snort/kurulum
+# wget http://skylink.dl.sourceforge.net/project/adodb/adodb-php5-only/adodb-519-for-php5/adodb519.zip -O adodb.zip
+# cd /var/www
+# unzip /usr/local/src/snort/kurulum/adodb.zip
+# mv adodb5 adodb
+```
+Base için: 
+```
+# cd /usr//local/src/snort/kurulum
+# wget http://sourceforge.net/projects/secureideas/files/BASE/base-1.4.5/base-1.4.5.tar.gz
+# cd /var/www/html
+# tar zxvf /usr/local/src/snort/base-1.4.5.tar.gz
+# mv base-1.4.5/ base/
+```
+BASE yapılandırması için:
+```
+# cd /var/www/html/base
+# cp base_conf.php.dist base_conf.php
+# nano base_conf.php
+```
+Dosyada ilgi satırları aşağıdaki gibi doldurun.
+
+> ....
+
+> $BASE_urlpath = "/base";
+
+> $DBlib_path = "/var/www/adodb/";
+
+> $DBtype = "mysql";
+
+> $alert_dbname = "snort";
+
+> $alert_host = "localhost";
+
+> $alert_port = "";
+
+> $alert_user = "snort"; 
+
+> $alert_password = "password";
+
+> ...
+
+Şimdi de base ekranımızı yetkisiz kişilere kapatmak için şifre koyalım. Bunun için önce şu komutu kullanarak kullanıcı ve şifre belirleyelim:
+```
+# mkdir /var/www/passwords
+# /usr/bin/htpasswd –c /var/www/passwords/passwords base2
+# service httpd restart
+```
+`# service httpd restart`
+
+Tüm bu adımların ardından internet tarayıcısının adres kısmına *"\_ip\_adresiniz_/base"* yazarak kurulum sayfasına gidiyoruz. Orada “Create BASE AG” butonuna tıklıyoruz ve sonra ana sayfaya yönlenmek için gerekli linke tıklıyoruz.
+
+__SEKIL 10__
+
+__SEKIL 11_
+
+# V. KARŞILAŞILAN HATALAR VE ÇÖZÜMLERİ
+
+* Snort kurulurken ‘daq_static library’ hatası alınıyorsa:
+
+> ...
+
+> checking for daq_load_modules in -ldaq_static... no
+
+> ERROR! daq_static library not found, go get it from
+
+> http://www.snort.org/.
+
+DAQ kurulumunu başalı bir şekilde yapmış iseniz şu adımları uygulayın:
+```
+# which daq-modules-config
+
+which: no daq-modules-config in (/sbin:/bin:/usr/sbin:/usr/bin)
+
+# export PATH=$PATH:/usr/local/bin
+```
+* libdnet.1: cannot open shared object file: No such file or directory hatası ile karşılaşıyorsanız ve libdnet kurulumu gerçekleştirmişseniz şu adımları uygulayın:
+```
+# locate libdnet
+# cp /usr/local/lib/libdnet.1.0.1 /usr/local/lib/libdnet.so.1.0.1
+# /sbin/ldconfig
+# updatedb
+```
+(honeyd: error while loading shared libraries: libdnet.1: cannot open shared objectfi : Linux Question, 2011)
+
+* Snort kural dosyası indirilirken üye girişi yapılmaz ise dosya açılmaya çalışılırken format hatası ile karşılaşılabilir.
+
+* Snort servis olarak kaydedildikten sonra ‘service snortd start’ komutu hata veriyor ve servis başlatılamıyorsa aynı zamanda da snort test modunda başarılı şekilde hata vermeden çalışmışsa şu işlemler yapılabilir.
+
+`# nano /etc/init.d/snortd` dosyasında yer alan, çalışması gereken uzun komutun fazla parametreleri silip bu hale döndürülebilir.
+
+> daemon /usr/sbin/snort $NO_PACKET_LOG $DUMP_APP -D $PRINT_INTERFACE $INTERFACE -u $USER -g $GROUP $CONF -l $LOGDIR/ /$i $PASS_FIRST $BPFFILE $BPF
+
+* Barnyard ile snort birbirine uyumlu olmalıdır. Snortun kayıt dizinini ile barnyardın dosya okuyacağı dizinler aynı olmalıdır.
+
+* Barnyard servisini çalıştırdıktan kısa bir süre sonra ‘service barnyard2 status’ komutu çalıştırıldığında aşağıdaki gibi bir mesaj ile karşılaşılmış ise barnyard yapılandırma dosyasında veri tabanı bağlantısı için gerekli bilgilerde eksik veya yanlışlık yapılmış olabilir.
+
+> barnyard2 dead but subsys locked
+
+(barnyard2 dead but subsys locked - error : superuser, 2014)
+
+* Barnyard servisi çalıştıktan sonra ‘tail -100 /var/log/messages’ komutu çalıştırıldığında aşağıdaki gibi bir uyarı ile karşılaşılıyorsa kuralla ilgili bir probleminiz olabilir. Kural oluşturulurken kuralın içermesi gereken bir parametre eksik kalmış veya veri tabanındaki tablo ile yazılmak istenen formatta uyuşma problemi olabilir.
+
+> WARNING database [Database()]: Called with Event[0x0] Event Type [0] (P)acket [0x151ffa0], information has not been outputed.
+
+(barnyard2 syslog warnings #76 : github.com, 2013)
+
+* Daha geniş hata ve çözümler için mail gruplarına göz atabilir ve sorularınızı yöneltebilirsiniz.
+
+	* Snort kullanıcıları mail grubu: 
+	 
+	*https://groups.google.com/forum/#!forum/mailing.unix.snort*
+
+	* Barnyard2 kullanıcıları mail grubu:
+	 
+	*https://groups.google.com/forum/#!forum/barnyard2-users*
 
 
+# VI. KAYNAKÇA
 
+* Rules Headers. snort.org: http://manual.snort.org/node29.html adresinden alındı
 
+* barnyard2 dead but subsys locked - error : superuser. (2014, Haziran 23). superuser.com: http://superuser.com/questions/772331/barnyard2-dead-but-subsys-locked-error adresinden alındı
 
+* barnyard2 syslog warnings #76 : github.com. (2013, Mart 30).https://github.com/firnsy/barnyard2/issues/76: https://github.com/firnsy/barnyard2/issues/76 adresinden alındı
 
+* BEALE, J., FOSTER, J. C., POSLUNS, J., & CASWELL, B. (2003). SNORT 2.0 Intrusion Detection.Rockland: Syngress Publihing. Inc.
 
+* Bir Ağ Güvenlik Aracı Olarak SNORT. (-, - -). http://cisn.metu.edu.tr/snort.php:http://cisn.metu.edu.tr/snort.php adresinden alındı
 
+* DAYIOĞLU, B. (2003, Nisan -). SNORT ile Saldırı Tespiti. SNORT ile Saldırı Tespiti. -, -,TÜRKİYE: Dikey8 Bilişim Güvenliği Girişimi
 
+* EROL, M. (tarih yok). Saldırı Tespit Sistemleri. Saldırı Tespit Sistemleri.
 
+* GÜVEN, E. N., & SAĞIROĞLU, Ş. (2008). Saldırı Tespit Sistemleri Üzerine Bir İnceleme. 3. ULUSLARARASI KATILIMLI BİLGİ GÜVENLİĞİ VE KRİPTOLOJİ KONFERANSI, (s. 273-274). Ankara.
 
+* honeyd: error while loading shared libraries: libdnet.1: cannot open shared object fi : Linux Question. (2011, Haziran 2). linuxquestions.org: http://www.linuxquestions.org/questions/linux-software-2/honeyd-error-while-loading-shared-
+libraries-libdnet-1-cannot-open-shared-object-fi-885653/ adresinden alındı
 
+* KAYA, U., & ERDEM, Ö. (2014, 06 24). Saldırı Tespit Sistemleri : Tübitak Bilgem. Tübitak Bilgem -Ulusal Bilgi Güvenliği Kapısı: http://www.bilgiguvenligi.gov.tr/saldiri-tespit-sistemleri/saldiri-tespit-sistemleri-snort-suricata-bro.html adresinden alındı
 
+* KILIÇ, Y. (OCAK - 2013). SNORT SALDIRI TESPİT SİSTEMİ. Bilecik: Bilecik Şeyh Edebali Üniversitesi Mühendislik Fakültesi.
+
+* PARKER, B. (2014, Mart 3). Getting SNORT working in CentOS 6.3/6.4 and VirtualBox 4.x.x.snort.org/documents: https://s3.amazonaws.com/snort-org-site/production/document\_files/files/000/000/002/original/snort296x_centos6x.pdf?AWSAccessKeyId=AKIAIXACIED2SPMSC7GA&Expires=1409571226&Signature=%2FktdJtzc%2FICLO13vh7xAXCpzVB4%3D adresinden alındı
+
+* Rehman, R. U. (2003). Intrusion Detection Systems with Snort: Advanced IDS Techniques with Snort, Apache, MySQL, PHP, and ACID. New Jersey: Pearson Education, Inc.
+
+* Roesch, M. (1999). SNORT - LIGHTWEIGHT INTRUSION DETECTION FOR NETWORKS . 
+
+* Proceedings of LISA '99: 13th Systems Administration Conference (s. 228-238). Seattle, Washington, USA: USENIX.
+
+* Snorby E-book. (2012). github.com: https://github.com/Snorby/snorby/wiki/Snorby-E-Book adresinden alındı
+
+* Snort Rules - Activate/Dynamic Rules. (tarih yok). manual.snort.org: http://manual.snort.org/node29.html#activate\_dynamic\_rule_example adresinden alındı
+
+* Writing Snort Rules . (-, - -). http://www.ussrback.com: http://www.ussrback.com/docs/papers/IDS/snort_rules.htm adresinden alındı
 
 
 
