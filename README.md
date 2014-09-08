@@ -17,9 +17,8 @@ Temel olarak saldırı tespit ve engelleme sistemleri hakkında genel bilgi, Sno
 
 
 
-
-__Hazırlayan:__
 ```
+ Hazırlayan:
  Hüsnü İŞLEYEN
  Netinternet Bilgisayar Telekomünikasyon San. ve Tic. Ltd. Şti.
 ```
