@@ -378,11 +378,7 @@ Kurulum paketlerinin bulunacağı dizini oluşturup gerekli kurulum paketlerini 
 
 ``` # cd /usr/local/src/snort/kurulum```
 
-Eğer gerekli programlar paket deposunda bulunamamış ise aşağıdaki linkler kullanılarak kurulum 
-
-dosyaları ** ‘/usr/local/src/snort/kurulum’ ** dizinine indirilir. Program zaten paket deposu yardımıyla 
-
-kurulmuş ise tekrar kurulum dosyasını indirmeye gerek yoktur. 
+Eğer gerekli programlar paket deposunda bulunamamış ise aşağıdaki linkler kullanılarak kurulum dosyaları  **‘/usr/local/src/snort/kurulum’** dizinine indirilir. Program zaten paket deposu yardımıyla kurulmuş ise tekrar kurulum dosyasını indirmeye gerek yoktur. 
 ```
 * LIBPCAP : 
 	# wget http://www.tcpdump.org/release/libpcap-1.6.1.tar.gz
