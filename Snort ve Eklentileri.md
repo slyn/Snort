@@ -2,7 +2,6 @@
 
 # I. BİLİNMESİ GEREKEN TEMEL KAVRAMLAR
 
-
 ## A. Simgeler ve Kısaltmalar
 
 Bu çalışmada kullanılan kısaltmaların, açıklamaları aşağıda verilmiştir.
@@ -467,3 +466,282 @@ Snort Kuralları için:
 Snort kurallarını indirmek için www.snort.org sitesine kayıt olmak gereklidir. Kayıt 
 işleminden sonra snort kurallarını indirip sisteme yükleyebiliriz. Bunun için şu komutları 
 kullanabiliriz. Aşağıdaki komutu kullanmak işin www.snort.org sitesine **üye girişi yapmalısınız.**
+
+```
+# cd /usr/local/src/snort/
+# wget https://www.snort.org/downloads/registered/snortrules-snapshot-2962.tar.gz
+```
+Snort grubu ve kullanıcısı oluşturuyoruz.
+```
+# groupadd –g 40000 snort
+# useradd snort –u 40000 –d /var/log/snort –s /sbin/nologin –c SNORT_IDS –g snort
+```
+Snort için gerekli dizinleri oluşturup dosya taşıma ve oluşturma işlemlerini yapıyoruz.
+```
+# mkdir /etc/snort
+# mkdir /var/log/snort
+# cd /etc/snort
+# cp /usr/local/src/snort/snort-2.9.6.2/etc/* .
+# tar -xvzf /usr/local/src/snort/kurulum/snortrules-snapshot-2962.tar.gz
+# mv /etc/snort/etc/* .
+# rm –rf /etc/snort/etc/
+# touch /etc/snort/rules/white_list.rules
+# touch /etc/snort/rules/black_list.rules
+# mkdir /usr/local/lib/snort_dynamicrules
+# cp -r /usr/local/snort/lib/snort_dynamicpreprocessor/ /usr/local/lib/
+# cp -r /usr/local/snort/lib/snort_dynamicengine /usr/local/lib/
+# cd /usr/local/src/snort
+```
+Gerekli kısayolları oluşturuyoruz.
+```
+# ln -s /usr/local/snort/bin/snort /usr/sbin/snort
+# ln -s /usr/local/snort/bin/snort /usr/bin/snort
+```
+Snort ile ilgili dosyaların sahibini, yeni oluşturduğumuz snort kişisi olarak ayarlıyoruz ve erişim hakkını da 700 olarak belirliyoruz. Aşağıdaki gibi komutlar kullanarak gerekli dizin ve dosyaların erişim izinlerini düzenliyoruz.
+```
+# chown –R snort:snort *
+# chmod –R 700 *
+# chown –R snort:snort /var/log/snort
+# chmod –R 700 /var/log/snort
+...
+# chown -R snort:snort snort_dynamicengine/
+# chown -R snort:snort snort_dynamicpreprocessor/
+# chmod -R 700 snort_dynamicpreprocessor/
+# chmod -R 700 snort_dynamicengine/
+# chmod -R 700 /usr/local/lib
+# chown -R snort:snort /usr/local/lib
+```
+
+
+Snort yapılandırması için öncelikle snort.conf dosyasını açmalıyız.
+```# nano /etc/snort/snort.conf ```
+* İlk kısımda bulunan HOME_NET kısmına trafiğini izlemek istediğimiz makinenin IP’sini yazıyoruz bu kısma tek ip yazabileceğimiz gibi bir ip aralığını da yazabiliriz. Bu şu şekilde olur.
+```
+...
+#Setup the network addresses you are protecting
+
+ipvar HOME_NET 192.168.44.132
+...
+```
+```
+...
+#Setup the network addresses you are protecting
+
+ipvar HOME_NET 192.168.44.1/24
+...
+```
+```
+...
+#Setup the network addresses you are protecting
+
+ipvar HOME_NET [ !192.168.44.132, 192.168.44.1/24]
+...
+```
+* İç ağımızı belirledikten sonra dış ağı da tanımlayabiliriz bunun için EXTERNAL\_NET kısmında değişiklikler yapılmalıdır. HOME_NET için yazılabilecek tüm şekiller burada da kullanılabilir. Çoğunlukla şu iki şekilde kullanılması tavsiye edilir.
+```
+...
+# Set up the external network addresses. Leave as "any" in most situations
+
+ipvar EXTERNAL_NET !$HOME_NET
+...
+```
+```
+...
+# Set up the external network addresses. Leave as "any" in most situations
+
+ipvar EXTERNAL_NET any
+...
+```
+* İç ve dış ağ belirlendikten sonra diğer gerekli dosya yollarını doğru bir şekilde yazıyoruz.
+__Konfigurasyon dosyasi resmi SEKIL 2__
+
+* Snort çıktılarını istenilen format özelliğine göre uygun biçimde dolduruyoruz. Barnyard2eklentisini kullanacağımız için unified2 formatında kayıt dosyalarına ihtiyacımız olacak bu yüzden çıktı kısmını aşağıdaki gibi düzenliyoruz.
+__UNIFIED2 resmi__
+
+* white\_list.rules ve black\_list.rules dosyalarını daha önceden oluşturmuştuk eğer daha önceden bu dosyalar oluşturulmamış ise oluşturulur. Eğer white\_list.rules ve black_list.rules dosyalarınız var ise yazmış olduğunuz daha önceden belirttiğiniz dosya dizinine (/etc/snort/rules) taşıyın.
+
+Yukarıda yapılan düzenlemeler snortun hatasız çalışması için yapılması zorunlu olan kısımlardan oluşmaktadır. Eğer istenirse daha detaylı bir yapılandırma da yapılabilir. Örneğin yapılandırma dosyasında bulunan logdir değişkenine bir dizin atanarak farklı bir kayıt dizini belirlenebilir.
+
+Yapılandırmanın ardından Snort’ u test modunda çalıştırarak Snort’ un eksiksiz bir şekilde kurulup kurulmadığına bakılır. Hatalar veya eksik kütüphaneler var ise bu durumlar düzeltilir. 
+
+```# snort -T –c /etc/snort/snort.conf```
+
+ Snort başarılı bir şekilde kurulmuş ise aşağıdaki gibi bir çıktı elde edilir.
+ 
+ __SEKIL4 HATASIZ SNORT TEST__
+ 
+ Snortun çalışmasını test etmek için aşağıdaki komutları kullanabilirsiniz.
+
+> snort -dev -l /var/log/snort
+
+> snort -l /var/log/snort -b
+
+> snort -dev -r / var/log/snort/snort.log.\_XXX_
+
+Snort kurulumu başarılı bir şekilde tamamlanmış ve yukarıdaki ekran ile karşılaşılmış ise 
+artık Snort’ u servis olarak kaydedebiliriz. Bunun için aşağıdaki gerekli işlemleri uyguluyoruz:
+
+Snort kurulum klasörünün içine giriyoruz.
+```
+# cd /usr/local/src/snort/snort-2.9.6.2
+# cp rpm/snortd /etc/init.d/
+# chmod +x /etc/init.d/snortd
+# cp rpm/snort.sysconfig /etc/sysconfig/snort
+# chkconfig --add snortd
+```
+
+Kopyaladığımız dosyalarda bazı değişiklikler yapmalıyız. 
+
+* Önce init.d dizinindeki snortd dosyasını yapılandıralım.
+
+```# nano /etc/init.d/snortd ```
+
+Snort barnyard için unified2 modunda kayıt yapmalıdır bu sebebden snortd dosyasındaki snortun çalışmasını sağlayan komutta bazı düzenlemeler yaparak binary kayıt yapmasını engelleyebiliriz.
+
+Şimdi de sysconfig dizinindeki snort dosyasında yapılacak olan değişikleri yapalım.
+```
+# nano /etc/sysconfig/snort
+```
+```
+...
+INTERFACE=eth0
+CONF=/etc/snort/snort.conf
+USER=snort
+GROUP=snort
+PASS_FIRST=0
+LOGDIR=/var/log/snort
+ALERTMODE=fast
+DUMP_APP=1
+BINARY_LOG=1
+NO_PACKET_LOG=0
+PRINT_INTERFACE=0
+SYSLOG=/var/log/messages
+SECS=5
+...
+```
+
+Snort artık sistemimize servis olarak kaydedildi. Snort’ u kullanmak için artık parametrelere ihtiyacımız kalmadı. Aşağıdaki komutlar ile snortu yönetebiliriz.
+
+> \# service snortd start --> komutu kullanılarak snort başlatılabilir. 
+
+> \# service snortd stop --> komutu ile çalışan snort durdurulabilir.
+
+> \# service snortd restart --> komutu ile snort yeniden başlatılabilir.
+
+> \# service snortd status --> komutu ile snort servisinin durumu hakkında bilgi alınabilir.
+
+
+# IV. BARNYARD & BASE KURULUMU
+
+Barnyard, Snort’ un çıktılarını kaydettiği dosyadan verileri alıp belirlenmiş olan veri tabanına kaydettiğinden ötürü barnyard kurulumunda önceliği MySQL veri tabanına veriyoruz. 
+
+Bunun için aşağıdaki komutu kullanabiliriz.
+
+MySQL için:
+```
+#yum install mysql mysql-devel mysql-server php-mysql php-adodb php-pear php-gd httpd libtool git -y
+```
+
+## A. Barnyard Kurulumu
+
+Veri tabanını kurduktan sonra Barnyard kurulumuna geçebiliriz. Bunun için önce kurulum dosyalarının bulunduğu dizine gidip Barnyard’i indiriyoruz.
+```
+# cd /usr/local/src/snort/
+# git clone https://github.com/firnsy/barnyard2.git
+# cd barnyard2
+# autogen.sh –fvi -I ./m4
+```
+
+Kurulumun gerçekleşeceği sistem
+
+i386 ise:
+```
+	# ./configure --with-mysql
+```
+
+x86_64 ise:
+```
+	# ./configure --with-mysql --with-mysql-libraries=/usr/lib64/mysql
+```
+Komutlarını kullanıyoruz.
+
+```
+# make && make install
+```
+
+Barnyard yapılandırması ve servis olarak çalışması için:
+```
+# cp rpm/barnyard2 /etc/init.d/
+# chmod +x /etc/init.d/barnyard2
+# cp rpm/barnyard2.config /etc/sysconfig/barnyard2
+# chkconfig --add barnyard2
+```
+Barnyard dosyaları için gerekli link ve arşiv klasörünü oluşturuyoruz.
+```
+# ln -s /usr/local/etc/barnyard2.conf /etc/snort/barnyard.conf
+# ln -s /usr/local/bin/barnyard2 /usr/bin/
+# mkdir –p /var/log/snort/eth0/archive/
+```
+Barnyard yapılandırması için:
+```
+# nano /etc/init.d/barnyard2
+```
+BARNYARD_OPTS ile başlayan satırdaki -L parametresini -l ile değiştiriyoruz
+
+> ...
+
+> \# chkconfig: 2345 70 60
+
+> ...
+
+> BARNYARD_OPTS="-D -c $CONF -d $SNORTDIR/${INT} -w $WALDO_FILE -l $SNORTDIR/${INT} -a $ARCHIVEDIR -f $LOG_FILE -X $PIDFILE $EXTRA_ARGS"
+
+> ...
+
+```
+# chkconfig barnyard2 reset
+```
+Barnyard’in, sysconfig dizinindeki dosyası içinde bulunan LOG_FILE değişkenini düzenliyoruz.
+```
+#nano /etc/sysconfig/barnyard2
+```
+> ...
+
+> LOG_FILE=”snort.log”
+
+> ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
