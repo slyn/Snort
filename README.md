@@ -10,3 +10,16 @@ Temel olarak saldırı tespit ve engelleme sistemleri hakkında genel bilgi, Sno
     * Barnyard
     * BASE
  * Snort 2.9.6.2
+
+
+
+
+
+
+
+
+> Hazırlayan: 
+
+> Hüsnü İŞLEYEN
+
+> Netinternet Bilgisayar Telekomünikasyon San. ve Tic. Ltd. Şti.
