@@ -361,5 +361,113 @@ Ayrıca, Snort’un output modülünde de anlatılmış olan ruletype ile kendim
 ```# nano /etc/snort/snort.conf```
 
  **'include $RULE_PATH/zzz.rules'** satırını ekleyip snort.conf dosyasından çıkıyoruz. Snort’u başlattığımızda 192.168.2.182 adresine, 192.168.2.182 dışındaki tüm IP adreslerinden gelen TCP paketleri kaydeder.
-	
-	
+
+# III. CentOS 6.5’ DE SNORT KURULUMU
+
+Snort kurulumu için gerekli diğer yazılımları indiriyoruz.
+
+``` # yum install libdnet libdnet-devel pcre pcre-devel gcc make flex byacc bison kernel-devel libxml2-devel wget git gcc-c++ zlib zlib-devel libpcap libpcap-devel -y ```
+
+``` # yum update ```
+
+``` # yum upgrade```
+
+Kurulum paketlerinin bulunacağı dizini oluşturup gerekli kurulum paketlerini indirelim.
+
+``` # mkdir -p /usr/local/src/snort/kurulum```
+
+``` # cd /usr/local/src/snort/kurulum```
+
+Eğer gerekli programlar paket deposunda bulunamamış ise aşağıdaki linkler kullanılarak kurulum 
+
+dosyaları ** ‘/usr/local/src/snort/kurulum’ ** dizinine indirilir. Program zaten paket deposu yardımıyla 
+
+kurulmuş ise tekrar kurulum dosyasını indirmeye gerek yoktur. 
+```
+* LIBPCAP : 
+	# wget http://www.tcpdump.org/release/libpcap-1.6.1.tar.gz
+
+* LIBDNET : 
+	# wget https://libdnet.googlecode.com/files/libdnet-1.12.tgz
+
+* ZLIB : 
+	# wget http://prdownloads.sourceforge.net/libpng/zlib-1.2.8.tar.gz
+
+* Snort DAQ:
+	# wget https://www.snort.org/downloads/snort/daq-2.0.2.tar.gz
+
+* Snort :
+	# wget https://www.snort.org/downloads/snort/snort-2.9.6.2.tar.gz
+
+* Snort Rules:
+	# wget https://www.snort.org/downloads/registered/snortrules-snapshot-2962.tar.gz
+```
+
+``` # cd ../```
+
+LIBDNET kurulumunu yapmak için:
+``` 
+# tar -xvzf kurulum/libdnet-1.12.tgz
+# cd libdnet-1.12/
+#./configure
+# make
+# make install
+# cd /usr/local/lib
+# ldconfig –v /usr/local/lib
+# cd /usr/local/src/snort/ 
+```
+
+LIBPCAP kurulumunu yapmak için:
+```
+# tar -xvzf kurulum/libpcap-1.6.1.tar.gz
+# cd libpcap-1.6.1
+# ./configure 
+# make 
+# make install
+# cd /usr/local/lib
+# ldconfig –v /usr/local/lib
+# cd /usr/local/src/snort/
+```
+
+ZLIB kurmak için:
+```
+# tar -xvzf kurulum/zlib-1.2.8.tar.gz
+# cd zlib-1.2.8
+# ./configure 
+# make 
+# make install
+# cd /usr/local/lib
+# ldconfig –v /usr/local/lib
+# cd /usr/local/src/snort/
+```
+Snort DAQ indirmek ve kurulumunu yapmak için:
+```
+ *  Otomatik olarak kurulumunu yapmak için aşağıdaki komutu kullanabiliriz:
+	# yum install https://www.snort.org/downloads/snort/daq-2.0.2-1.centos6.x86_64.rpm -y 
+
+ *  Tar.gz dosyasından elle kurulum yapmak için 
+	# tar -xvzf kurulum/daq-2.0.2.tar.gz
+	# cd daq-2.0.2 
+	# ./configure 
+	# make 
+	# make install
+	# cd /usr/local/lib
+	# ldconfig –v /usr/local/lib
+	# cd /usr/local/src/snort/
+```
+
+SNORT kurulumunu yapmak için:
+```
+# tar -xvzf kurulum/snort-2.9.6.2.tar.gz
+# cd snort-2.9.6.2/
+# ./configure --prefix /usr/local/snort --enable-sourcefire 
+# make 
+# make install
+# cd /usr/local/lib
+# ldconfig –v /usr/local/lib
+```
+Snort Kuralları için: 
+
+Snort kurallarını indirmek için www.snort.org sitesine kayıt olmak gereklidir. Kayıt 
+işleminden sonra snort kurallarını indirip sisteme yükleyebiliriz. Bunun için şu komutları 
+kullanabiliriz. Aşağıdaki komutu kullanmak işin www.snort.org sitesine **üye girişi yapmalısınız.**
