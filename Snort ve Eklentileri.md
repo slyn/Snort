@@ -141,7 +141,7 @@ tespit edebilir.</p>
 
 Bu bileşenlerin çalışma mimarisi aşağıdaki resimdeki gibidir.
 
-![Snort Mimarisi](RESIM MIMARISI.png)
+![Snort Mimarisi](https://github.com/slyn/Snort/blob/master/resim/mimari.png)
 
 ### Packet Decoder:
 Ağ ara yüzünden çeşitli tiplerdeki paketleri alır ve bir sonraki snort bileşeni için hazırlar.
