@@ -241,7 +241,7 @@ Snort şu üç faklı şekilde çalışması için yapılandırılabilir:
 
 <p>Kural yazması hem çok kolay hem de saldırıları tespit etmede başarılıdır. Kural yazmaya başlamadan önce örnek bir snort kuralı inceleyerek snort kurallarının genel yapısı hakkında bilgi sahibi olalım. Örnek olarak aşağıdaki gibi bir kuralı inceleyebiliriz.</p>
 
-![KURAL](Kuralgrafigi)
+![KURAL](https://github.com/slyn/Snort/blob/master/resim/Screenshot%20from%202014-09-08%2023:07:57.png)
 
 <p>Snort kuralları kural başlığı ve kural seçeneği olmak üzere iki kısımdan oluşur. Kural başlığı kural eylemi, kural protokolü, hedef ve kaynak ip adresleri ile hedef ve kaynak port bilgilerini bulundurur. Diğer kısım ise hangi durumda belirlenen eylemin gerçekleşeceğini ve alarm mesajı ile ilgili özelliklerin tanımlandığı alanları içerir. Parantez işaretine kadar olan kısım kural başlığını (rule header) oluşturur ve her kuralda bulunması gereken kısımdır. Parantez içerisindeki kısım ise kural seçeneğini (rule options) oluşturur.</p>
 
@@ -543,10 +543,10 @@ ipvar EXTERNAL_NET any
 ...
 ```
 * İç ve dış ağ belirlendikten sonra diğer gerekli dosya yollarını doğru bir şekilde yazıyoruz.
-__Konfigurasyon dosyasi resmi SEKIL 2__
+![YAPILANDIRMA_DOSYASINDAN](https://github.com/slyn/Snort/blob/master/resim/sekil2.png)
 
 * Snort çıktılarını istenilen format özelliğine göre uygun biçimde dolduruyoruz. Barnyard2eklentisini kullanacağımız için unified2 formatında kayıt dosyalarına ihtiyacımız olacak bu yüzden çıktı kısmını aşağıdaki gibi düzenliyoruz.
-__UNIFIED2 resmi__
+![YAPILANDIRMA_DOSYASINDAN](https://github.com/slyn/Snort/blob/master/resim/sekil3.png)
 
 * white\_list.rules ve black\_list.rules dosyalarını daha önceden oluşturmuştuk eğer daha önceden bu dosyalar oluşturulmamış ise oluşturulur. Eğer white\_list.rules ve black_list.rules dosyalarınız var ise yazmış olduğunuz daha önceden belirttiğiniz dosya dizinine (/etc/snort/rules) taşıyın.
 
@@ -558,7 +558,7 @@ Yapılandırmanın ardından Snort’ u test modunda çalıştırarak Snort’ u
 
  Snort başarılı bir şekilde kurulmuş ise aşağıdaki gibi bir çıktı elde edilir.
  
- __SEKIL4 HATASIZ SNORT TEST__
+ ![SNORT_HATASIZ](https://github.com/slyn/Snort/blob/master/resim/sekil4.png)
  
  Snortun çalışmasını test etmek için aşağıdaki komutları kullanabilirsiniz.
 
@@ -705,7 +705,7 @@ Barnyard’in, sysconfig dizinindeki dosyası içinde bulunan LOG_FILE değişke
 # service snortd start
 # service barnyard2 start
 ```
-__SERVISLER CALISIYOR RESMI__()
+![SERVISLER_CALISIYOR](https://github.com/slyn/Snort/blob/master/resim/sekil5.png)
 
 ### 1. MySQL veri tabanı oluşturmak gerekli izinleri sağlamak
 ```
@@ -730,7 +730,7 @@ Simdi de snort veri tabanını oluşturalım.
 
 > show tables;
 
-*** RESIM SEKIL 6 ***
+![TABLO_BOS](https://github.com/slyn/Snort/blob/master/resim/sekil6.png)
 
 > source /usr/local/src/snort/barnyard2/schemas/create_mysql
 
@@ -758,9 +758,9 @@ Barnyard config dosyasında yapılması gereken düzenlemeler yapılır.
 
 > ...
 
-__SEKIL 7__
+![YAPILANDIRMA](https://github.com/slyn/Snort/blob/master/resim/sekil7.png)
 
-__SEKIL 8__
+![YAPILANDIRMA](https://github.com/slyn/Snort/blob/master/resim/sekil8.png)
 
 Barnyardı yeniden başlatmalıyız.
 ```
@@ -813,7 +813,7 @@ Ayrıca bu dosya sayesinde dizinlere erişimi kısıtlayabiliriz bunun için dos
 
 Burada apache server’ın kullanmasını istediğimiz veya istemediğimiz modüllerini httpd.conf dosyasından kullanıma açabilir veya kapatabiliriz.
 
-__SEKIL 9__
+![Apache_module](https://github.com/slyn/Snort/blob/master/resim/sekil9.png)
 
 Iptables servisinde gerekli değişiklikler yapılmalıdır:
 
@@ -905,9 +905,9 @@ Dosyada ilgi satırları aşağıdaki gibi doldurun.
 
 Tüm bu adımların ardından internet tarayıcısının adres kısmına *"\_ip\_adresiniz_/base"* yazarak kurulum sayfasına gidiyoruz. Orada “Create BASE AG” butonuna tıklıyoruz ve sonra ana sayfaya yönlenmek için gerekli linke tıklıyoruz.
 
-__SEKIL 10__
+![TABLOLAR](https://github.com/slyn/Snort/blob/master/resim/sekil10.png)
 
-__SEKIL 11_
+![KAYIT_SAYISI](https://github.com/slyn/Snort/blob/master/resim/sekil%2011.png)
 
 # V. KARŞILAŞILAN HATALAR VE ÇÖZÜMLERİ
 
